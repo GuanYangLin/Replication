@@ -1,0 +1,32 @@
+public static double DimMax(int dL, int dH, Constraint C) { // compute the max value at the (dL)th dimension
+		recover_New(dL + 1); // recover the status of the last dimension
+		LD_degree_calculation_New(dL + 1); // compute degree of last dimension
+		FindSubgraph3_New(dL, dH, C);
+		sort_by_attribute(0, dim_size[dL], dL);
+		int ptr = 0;
+		int fg = 1;
+		int unode;
+		double maxval = 0;
+		visit_record.clear();
+		list.clear();
+		while (true) {
+			ptr = find_next_node(ptr, dim_size[dL], dL);
+			if (ptr == -1) {
+				break;
+			}
+			unode = vert[dL][ptr].nodeId;
+			maxval = Math.max(maxval, atrributes[unode][dL]);
+			list.clear();
+            key_node[dL] = unode;
+			fg = DFS_New(unode, dL, dH, C);
+			if (fg == 0){
+				break;
+			}
+			ptr = find_next_node(ptr, dim_size[dL], dL);
+			if (ptr == -1) {
+				break;
+			}
+			visit_record.addAll(list);
+		}
+		return maxval;
+	}
