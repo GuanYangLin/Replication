@@ -1,7 +1,7 @@
-public static double TRPSCQ2D(int dH, Constraint C){
+public static double 2D(int dH, Constraint C){
 		double rt = 0;
 		C.corner[2] = 0;
-		double c = DimMax3_New(2, dH, C);
+		double c = DimMax(2, dH, C);
 		Constraint cstt=(C);
 		cstt.corner[2] = c;
 		cstt.keyNodes[2] = key_node[2];
@@ -9,7 +9,7 @@ public static double TRPSCQ2D(int dH, Constraint C){
 		while (c > 0.0) {
 			sl=new Result();
 			rt = Math.max(rt, c);
-			sl.value[1] = DimMax3_New(1, dH, cstt);
+			sl.value[1] = DimMax(1, dH, cstt);
 			sl.value[2] = c;
 			sl.size = dim_size[1];
 			node[] newVer = new node[sl.size];
@@ -32,7 +32,7 @@ public static double TRPSCQ2D(int dH, Constraint C){
 			RES[2].result.add(sl);
 			cstt.corner[1] = sl.value[1];
 			cstt.corner[2] = 0;
-			c = DimMax3_New(2, dH, cstt);
+			c = DimMax(2, dH, cstt);
 			for (int i = 0; i < dim_size[2]; i++) {
 				vert[3][i] = vert[2][i];
 			}
