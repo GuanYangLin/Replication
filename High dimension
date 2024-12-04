@@ -1,0 +1,96 @@
+public static void TRPSCQHD(int dL, int dH, Constraint C) { // dL: the current dimension; dH: the starting dimension
+		PriorityQueue<Constraint> Q = new PriorityQueue<Constraint>(new Comparator<Constraint>() { 
+			@Override
+			public int compare(Constraint o1, Constraint o2) {
+				// TODO Auto-generated method stub
+				if (o1.corner[dL] < o2.corner[dL]) {
+					return 1;
+				} else if (o1.corner[dL] > o2.corner[dL]) {
+					return -1;
+				} else {
+					return 0;
+				}
+			}
+		});
+		while (!Q.isEmpty()) {
+			Q.poll();
+		}
+		if (dL == 3) {
+			TRPSCQ3D(dL, dH, C);
+			return;
+		}
+		C.corner[dL] = 0;
+		double c;
+		c = DimMax3_New(dL, dH, C);
+		if (c == 0.0)
+			return;
+		Constraint cstt;
+		cstt = C;
+		cstt.d = dL;
+		cstt.corner[dL] = c;
+		cstt.keyNodes[dL] = key_node[dL];
+		Q.add(cstt);
+		Constraint cstt1 = new Constraint();
+		Result sl = new Result();
+		LCP[dL - 1].LC.clear();
+		LCP[dL - 1].LC.add(cstt1);
+		while (!Q.isEmpty()) {
+			c = Q.peek().corner[dL];
+			RES[dL - 1].result.clear();
+			while ((!Q.isEmpty()) && (Q.peek().corner[dL] == c)) {
+				cstt1 = Q.peek();
+				Q.poll();
+				recover_New(dL + 1);
+				LD_degree_calculation_New(dL + 1);
+				FindSubgraph3_New(dL, dH, cstt1);
+				TRPSCQHD(dL - 1, dH, cstt1);
+			}
+			for (int i = 0; i < RES[dL - 1].result.size(); i++) {
+				long p3 = System.currentTimeMillis();
+				long ti=p3-st2;
+				if(dL==dH-1&&ti>=7200000)
+					return;
+				sl = RES[dL - 1].result.get(i);
+				Result sl2 = sl;
+				sl2.value[dL] = c;
+				int len = RES[dL].result.size();
+				int idctr = 0;
+				for (int k = 0; k < len; k++) { // There may be some identical skyline communities.
+					idctr = 1;
+					for (int j = 1; j <= dL; j++) {
+						if (RES[dL].result.get(k).value[j] < sl2.value[j]) { // >=
+							idctr = 0;
+							break;
+						}
+					}
+					if (idctr == 1)
+						break;
+				}
+				if (idctr == 0) {
+					RES[dL].result.add(sl2); // A new skyline has been found.
+					UpdateCornerPoints(sl2, dL - 1); // update corner points
+				}
+			}
+			ArrayList<Constraint> LC = LCP[dL - 1].LC;
+			Iterator<Constraint> it = LC.iterator();
+			while (it.hasNext()) {
+				cstt = it.next();
+				Constraint cstt_temp = new Constraint(cstt);
+				if (cstt_temp.corner[0] == 1) {
+					continue;
+				}
+				cstt_temp.d = dL;
+				cstt_temp.corner[dL] = 0;
+				for (int j = dL + 1; j <= dH; j++) {
+					cstt_temp.corner[j] = C.corner[j];
+					cstt_temp.keyNodes[j] = key_node[j];
+				}
+				cstt_temp.corner[dL] = DimMax3_New(dL, dH, cstt);
+				if (cstt_temp.corner[dL] > 0.0) {
+					cstt_temp.keyNodes[dL] = key_node[dL];
+					Q.add(cstt_temp);
+				}
+				cstt.corner[0] = 1;
+			}
+		}
+	}
